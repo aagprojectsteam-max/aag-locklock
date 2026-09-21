@@ -134,6 +134,8 @@ class NamedPipeServer:
         self._stop = threading.Event()
         self._ready = threading.Event()
         self.error = None
+        self.last_request_error = None
+        self.phase = "new"
         self._thread = threading.Thread(target=self._run, name="locklock-win-pipe", daemon=True)
 
     def start(self):
@@ -161,7 +163,10 @@ class NamedPipeServer:
                 win32pipe.PIPE_ACCESS_DUPLEX | 0x00080000,
                 mode, 1, MAX_MESSAGE_BYTES, MAX_MESSAGE_BYTES, 1000,
                 _security_attributes(self.authorized_sid))
+            self.phase = "created"
             while not self._stop.is_set():
+                self.last_request_error = None
+                self.phase = "listening"
                 self._ready.set()
                 try:
                     while not self._stop.is_set():
@@ -169,27 +174,36 @@ class NamedPipeServer:
                             win32pipe.ConnectNamedPipe(pipe, None)
                         except Exception as exc:
                             if getattr(exc, "winerror", None) == 535:  # CONNECTED
+                                self.phase = "connected"
                                 break
                             if getattr(exc, "winerror", None) != 536:  # LISTENING
                                 raise
                         # Initial success means listening in PIPE_NOWAIT mode.
                         self._stop.wait(.025)
                     deadline = Deadline(5, self._stop)
+                    self.phase = "reading-request"
                     request = read_message(pipe, deadline, win32file)
+                    self.phase = "request-read"
                     sid, administrator = _verified_client(pipe)
+                    self.phase = "client-verified"
                     if sid not in {self.authorized_sid, "S-1-5-18"} and not administrator:
                         response = {"ok":False, "error":"unauthorized pipe client"}
                     else:
                         response = self.dispatch(request)
                     write_message(pipe, response, deadline, win32file)
+                    self.phase = "response-written"
                     # Disconnect would discard unread bytes. A bounded ACK
                     # replaces the old unbounded server FlushFileBuffers call.
+                    self.phase = "awaiting-ack"
                     read_message(pipe, deadline, win32file)
+                    self.phase = "ack-read"
                 except (TimeoutError, InterruptedError, EOFError):
                     pass
                 except Exception as exc:
+                    self.last_request_error = f"{type(exc).__name__}: {exc}"
                     logging.getLogger(__name__).warning("pipe request rejected: %s", exc)
                 finally:
+                    self.phase = "disconnecting"
                     try:
                         win32pipe.DisconnectNamedPipe(pipe)
                     except Exception:

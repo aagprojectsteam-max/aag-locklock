@@ -12,7 +12,15 @@ class NativeTests(unittest.TestCase):
         server.start()
         try:
             for _ in range(3):
-                response = send_request(name, {'cmd':'fixture'}, timeout_ms=5000)
+                try:
+                    response = send_request(name, {'cmd':'fixture'}, timeout_ms=5000)
+                except Exception as exc:
+                    self.fail(
+                        f"client={type(exc).__name__}: {exc}; "
+                        f"server_phase={server.phase}; "
+                        f"server_request_error={server.last_request_error!r}; "
+                        f"server_error={server.error!r}"
+                    )
                 self.assertEqual(response, {'ok':True,'echo':{'cmd':'fixture'}})
         finally:
             server.close()
