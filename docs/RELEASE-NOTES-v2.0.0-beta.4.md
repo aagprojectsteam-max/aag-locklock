@@ -12,6 +12,7 @@ been deployed on the reference machine.
 - keep the legacy fail-closed sleep graph probe when the AAG transaction
   configuration is absent;
 - add adapter-contract and version-consistency regression tests;
+- fix Windows PIPE_NOWAIT connect polling to recognize pywin32's returned ERROR_PIPE_CONNECTED status;
 - keep local reports and production evidence out of the public source tree.
 
 ## Qualification

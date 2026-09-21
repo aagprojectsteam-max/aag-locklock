@@ -171,14 +171,25 @@ class NamedPipeServer:
                 try:
                     while not self._stop.is_set():
                         try:
-                            win32pipe.ConnectNamedPipe(pipe, None)
+                            result = win32pipe.ConnectNamedPipe(pipe, None)
                         except Exception as exc:
-                            if getattr(exc, "winerror", None) == 535:  # CONNECTED
+                            error = getattr(exc, "winerror", None)
+                            if error == 535:  # ERROR_PIPE_CONNECTED
                                 self.phase = "connected"
                                 break
-                            if getattr(exc, "winerror", None) != 536:  # LISTENING
+                            if error != 536:  # ERROR_PIPE_LISTENING
                                 raise
-                        # Initial success means listening in PIPE_NOWAIT mode.
+                        else:
+                            # pywin32 returns ERROR_PIPE_CONNECTED (535) as a
+                            # normal result rather than raising. In PIPE_NOWAIT
+                            # mode, result 0 only makes a disconnected instance
+                            # available/listening; a good connection is
+                            # established only after 535 is observed.
+                            if result == 535:
+                                self.phase = "connected"
+                                break
+                            if result != 0:
+                                raise OSError(f"unexpected ConnectNamedPipe result: {result}")
                         self._stop.wait(.025)
                     deadline = Deadline(5, self._stop)
                     self.phase = "reading-request"
