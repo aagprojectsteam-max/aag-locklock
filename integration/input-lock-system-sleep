@@ -1,0 +1,11 @@
+#!/bin/sh
+# Safety belt for distributions where the login1 D-Bus signal is delayed.
+# The daemon itself validates UNLOCK_ON_SUSPEND before changing state.
+
+case "${1:-}" in
+    pre)
+        /usr/bin/input-lock prepare-sleep >/dev/null 2>&1 || true
+        ;;
+esac
+
+exit 0

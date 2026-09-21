@@ -1,0 +1,16 @@
+[Unit]
+Description=Request the established AAG safe-suspend and closed-lid recovery path
+OnFailure=aag-suspend-failure-failsafe.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/lib/input-lock/input_lock_safety.py protect
+TimeoutStartSec=165s
+UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/input-lock
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX

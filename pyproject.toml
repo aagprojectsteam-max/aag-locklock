@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=75,<83", "wheel>=0.45,<1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aag-locklock"
+version = "2.0.0b4"
+description = "Safe input locking for Ubuntu and Windows"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{name = "AAG Projects Team"}]
+dependencies = [
+  "pywin32>=306,<400; platform_system == 'Windows'",
+  "pystray>=0.19.5,<0.20; platform_system == 'Windows'",
+  "Pillow>=10.4,<13; platform_system == 'Windows'",
+]
+
+[project.optional-dependencies]
+windows-build = ["pyinstaller>=6.10,<7"]
+
+[project.scripts]
+locklock-windows = "locklock_windows.agent:main"
+locklock-windows-cli = "locklock_windows.cli:main"
+locklock-windows-service = "locklock_windows.service:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = [
+  "input_lock_cli",
+  "input_lock_common",
+  "input_lock_daemon",
+  "input_lock_gnome",
+  "input_lock_notifier",
+  "input_lock_lid_policy",
+  "input_lock_safety",
+  "aag_sleep_transaction_compat",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["locklock_core*", "locklock_windows*"]

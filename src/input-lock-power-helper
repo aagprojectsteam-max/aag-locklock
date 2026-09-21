@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+"""Restoration-only root helper for legacy LockLock UPower overrides."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+
+from input_lock_lid_policy import PolicyError, UPowerPolicyController
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="LockLock UPower policy helper")
+    parser.add_argument("action", choices=("enable", "disable", "status"))
+    args = parser.parse_args()
+    if args.action != "status" and os.geteuid() != 0:
+        print("root privileges are required", file=sys.stderr)
+        return 2
+    controller = UPowerPolicyController()
+    try:
+        if args.action == "enable":
+            payload = controller.enable()
+        elif args.action == "disable":
+            payload = controller.disable()
+        else:
+            payload = controller.status()
+    except (OSError, subprocess.SubprocessError, PolicyError) as exc:
+        print(f"input-lock power helper: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(payload, ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,58 @@
+[Unit]
+Description=Input Lock evdev daemon
+Documentation=file:/usr/share/doc/input-lock/README.md
+After=systemd-udevd.service systemd-user-sessions.service
+Wants=systemd-udevd.service
+OnFailure=aag-suspend-failure-failsafe.service
+StartLimitIntervalSec=60s
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=input-lockd
+Group=input-lockd
+SupplementaryGroups=input
+# A previous session may have ended while the temporary UPower override was
+# active.  Remove it as root before the unprivileged daemon starts.
+ExecStartPre=+/usr/lib/input-lock/input-lock-power-helper disable
+ExecStart=/usr/lib/input-lock/input-lock-daemon
+ExecStopPost=+/usr/lib/input-lock/input-lock-power-helper disable
+LimitNOFILE=512
+ExecReload=/bin/kill -HUP $MAINPID
+WatchdogSec=20s
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=5s
+RuntimeDirectory=input-lock
+RuntimeDirectoryMode=0755
+StateDirectory=input-lock
+StateDirectoryMode=0700
+UMask=0077
+
+# The daemon needs the host /dev/input nodes and libudev's netlink socket.
+PrivateDevices=no
+DevicePolicy=closed
+DeviceAllow=char-input rw
+DeviceAllow=/dev/uinput rw
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+
+# Hardening. No network stack, writable home, module access, or new privilege.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+RemoveIPC=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+"""Installed entry point for input-lock-notifier."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+installed = Path("/usr/lib/input-lock")
+source_tree = Path(__file__).resolve().parent
+sys.path.insert(0, str(installed if installed.is_dir() else source_tree))
+
+from input_lock_notifier import main  # noqa: E402
+
+raise SystemExit(main())

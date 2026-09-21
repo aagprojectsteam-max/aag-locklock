@@ -1,0 +1,16 @@
+[Unit]
+Description=Input Lock tray indicator and desktop notifications
+PartOf=graphical-session.target
+After=graphical-session-pre.target gnome-session-initialized.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/python3 /usr/lib/input-lock/input_lock_lid_policy.py disable-user
+ExecStart=/usr/lib/input-lock/input-lock-notifier
+ExecStopPost=-/usr/bin/input-lock session-ended
+ExecStopPost=/usr/bin/python3 /usr/lib/input-lock/input_lock_lid_policy.py disable-user
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=graphical-session.target

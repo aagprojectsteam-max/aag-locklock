@@ -1,0 +1,71 @@
+name: LockLock CI
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  shared:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python tools/publication_scan.py
+      - run: python tools/run_tests.py shared
+      - run: python -m compileall -q src tests tools
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/publication_scan.py
+      - run: sudo apt-get update && sudo apt-get install -y python3-gi python3-dbus python3-evdev python3-pyudev gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1 shellcheck
+      - run: /usr/bin/python3 tools/run_tests.py linux
+      - run: /usr/bin/python3 -S -B -m unittest discover -s tests -p test_daemon_logic.py
+      - run: bash tests/test_config.sh
+      - run: shellcheck install.sh update.sh uninstall.sh integration/input-lock-system-sleep src/input-lock-launch
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python tools/publication_scan.py
+      - run: python -m pip install -e ".[windows-build]"
+      - run: python tools/run_tests.py shared
+      - run: python tools/run_tests.py windows-native
+      - name: Parse PowerShell without executing installers
+        shell: pwsh
+        run: |
+          Get-ChildItem windows/*.ps1 | ForEach-Object {
+            $Tokens = $null; $ParseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$Tokens, [ref]$ParseErrors) | Out-Null
+            if ($ParseErrors) { throw ($ParseErrors | Out-String) }
+          }
+      - name: Build unsigned Windows executables
+        shell: pwsh
+        run: ./windows/build.ps1 -SkipTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LockLock-Windows-unsigned
+          path: windows/out/
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python tools/publication_scan.py
+      - run: python -m pip install build
+      - run: python -m build
+      - run: python tools/check_artifacts.py dist

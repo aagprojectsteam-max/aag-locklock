@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -u
+
+notify_error() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send --urgency=critical 'Input Lock' "$1"
+    fi
+}
+
+if ! systemctl is-active --quiet input-lock.service; then
+    if ! pkexec /usr/bin/systemctl start input-lock.service; then
+        notify_error 'Input Lock was not started. Administrator authentication was cancelled or failed.'
+        exit 1
+    fi
+fi
+
+if ! systemctl --user start input-lock-notifier.service; then
+    notify_error 'The Input Lock service started, but the tray icon could not be opened.'
+    exit 1
+fi
+
+exit 0

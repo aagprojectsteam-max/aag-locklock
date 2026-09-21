@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Input Lock
+GenericName=Input Device Lock
+Comment=Lock or unlock the keyboard and pointing devices
+Exec=/usr/bin/input-lock-launch
+Icon=input-lock-unlocked
+Terminal=false
+Categories=Utility;
+Keywords=keyboard;mouse;touchpad;lock;input;
+StartupNotify=true
