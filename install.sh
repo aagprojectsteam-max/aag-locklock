@@ -116,7 +116,8 @@ for required in \
     "$PROJECT_DIR/assets/input-lock-unlocked.svg" \
     "$PROJECT_DIR/assets/input-lock-locked-lid-ignored.svg" \
     "$PROJECT_DIR/assets/input-lock-unlocked-lid-ignored.svg" \
-    "$PROJECT_DIR/assets/aag-projects-team.png"; do
+    "$PROJECT_DIR/assets/aag-projects-team.png" \
+    "$PROJECT_DIR/LICENSE"; do
     [[ -f "$required" ]] || fail "package is incomplete: $required"
 done
 
@@ -292,6 +293,7 @@ install -m 0755 "$PROJECT_DIR/integration/input-lock-system-sleep" /usr/lib/syst
 rm -rf -- /usr/share/doc/input-lock
 install -d -m 0755 /usr/share/doc/input-lock
 install -m 0644 "$PROJECT_DIR/README.md" /usr/share/doc/input-lock/README.md
+install -m 0644 "$PROJECT_DIR/LICENSE" /usr/share/doc/input-lock/LICENSE
 cp -R --no-preserve=ownership -- "$PROJECT_DIR/docs/." /usr/share/doc/input-lock/
 
 cat > /etc/input-lock/install-state <<EOF

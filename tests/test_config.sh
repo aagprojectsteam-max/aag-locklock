@@ -36,6 +36,7 @@ grep -q 'org.freedesktop.login1.inhibit-handle-lid-switch' \
 grep -q 'input-lock-protect.service' \
     "$PROJECT_DIR/config/90-input-lock.rules"
 grep -q '99-zzzz-input-lock-no-auto-sleep.conf' "$PROJECT_DIR/install.sh"
+grep -Fq '"$PROJECT_DIR/LICENSE" /usr/share/doc/input-lock/LICENSE' "$PROJECT_DIR/install.sh"
 grep -q 'After=.*gnome-session-initialized.target' \
     "$PROJECT_DIR/systemd/input-lock-notifier.service"
 
