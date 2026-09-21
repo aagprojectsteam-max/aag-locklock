@@ -165,7 +165,6 @@ class NamedPipeServer:
                 _security_attributes(self.authorized_sid))
             self.phase = "created"
             while not self._stop.is_set():
-                self.last_request_error = None
                 self.phase = "listening"
                 self._ready.set()
                 try:
