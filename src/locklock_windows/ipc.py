@@ -47,13 +47,12 @@ def _security_attributes(authorized_sid: str):
 
 def _verified_client(pipe) -> tuple[str, bool]:
     import win32api
-    import win32pipe
     import win32security
 
     impersonated = False
     token = None
     try:
-        win32pipe.ImpersonateNamedPipeClient(pipe)
+        win32security.ImpersonateNamedPipeClient(pipe)
         impersonated = True
         token = win32security.OpenThreadToken(
             win32api.GetCurrentThread(), win32security.TOKEN_QUERY, True

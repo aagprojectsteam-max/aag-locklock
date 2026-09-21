@@ -13,6 +13,7 @@ been deployed on the reference machine.
   configuration is absent;
 - add adapter-contract and version-consistency regression tests;
 - fix Windows PIPE_NOWAIT connect polling to recognize pywin32's returned ERROR_PIPE_CONNECTED status;
+- call named-pipe client impersonation through pywin32's win32security module;
 - keep local reports and production evidence out of the public source tree.
 
 ## Qualification
