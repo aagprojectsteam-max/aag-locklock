@@ -26,3 +26,7 @@ been deployed on the reference machine.
 - final state: unlocked, lid-ignore off, no LockLock inhibitor, no release errors
 
 See docs/BETA4-QUALIFICATION.md.
+
+## License
+
+AAG LockLock is licensed under the MIT License. See the repository LICENSE file and the LICENSE asset attached to this release.

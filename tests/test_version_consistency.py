@@ -22,6 +22,14 @@ class VersionConsistencyTests(unittest.TestCase):
         public = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
         self.assertIn(f"# AAG LockLock {public}", (ROOT / "README.md").read_text(encoding="utf-8"))
 
+    def test_mit_license_is_declared_and_present(self):
+        project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+        self.assertEqual(project["license"], "MIT")
+        self.assertEqual(project["license-files"], ["LICENSE"])
+        text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("MIT License\n"))
+        self.assertIn("Copyright (c) 2026 AAG Projects Team", text)
+
 
 if __name__ == "__main__":
     unittest.main()

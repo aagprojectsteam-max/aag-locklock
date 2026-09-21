@@ -5,6 +5,8 @@ Version 2.0.0-beta.4: Linux keeps the accepted beta.3 safety/thermal correction 
 
 Current Linux production acceptance: [beta.4 Linux qualification](docs/BETA4-QUALIFICATION.md).
 
+**License:** MIT — see [LICENSE](LICENSE).
+
 הפרויקט כולל שני backends נפרדים: תמיכת Ubuntu 26.04 LTS, ‏GNOME 50 ו־Wayland המוכחת, וגרסת בטא ל־Windows 11 x64. שתי המערכות חולקות ליבת הגדרות, פרוטוקול ומדיניות, אך משתמשות במנגנוני מערכת מקוריים ונפרדים.
 
 ב־Ubuntu מנגנון `evdev` הקיים נשאר נתמך במלואו. ב־Windows נוספו Agent ללא Terminal, סמל Tray, הגדרות, Named Pipe מאובטח, hooks למקלדת ולעכבר, שירות לשינוי זמני ובר־שחזור של מדיניות המכסה, בניית EXE ותסריטי התקנה/הסרה. תכונות Windows התלויות בחומרה מסומנות **Experimental** עד שהן עוברות את [בדיקת החומרה](windows/README.md) במחשב היעד. נעילת מסך מגע עצמאית ב־Windows אינה נתמכת כרגע והתיבה מושבתת; התוכנה אינה מציגה אירועי מגע שהומרו לעכבר כהוכחה לנעילת מסך מגע.
