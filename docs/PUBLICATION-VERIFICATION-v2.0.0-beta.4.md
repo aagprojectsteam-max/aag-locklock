@@ -55,3 +55,20 @@ The public repository starts from a sanitized source snapshot. Local machine
 paths, user identity, hardware serials, private backups, forensic reports and
 host-specific engineering/recovery evidence are excluded. A fail-closed
 `tools/publication_scan.py` gate runs in CI and Release workflows.
+
+## Post-publication MIT licensing
+
+On 2026-09-22, AAG Projects Team adopted the MIT License for AAG LockLock.
+
+- repository license detection: MIT
+- source metadata: license = MIT
+- package metadata: PEP 639 License-Expression: MIT
+- future wheel builds include dist-info/licenses/LICENSE
+- future source distributions include top-level LICENSE
+- existing beta.4 tag remains unchanged
+- original beta.4 wheel and source archive remain unchanged
+- a standalone LICENSE asset was attached to the beta.4 Release
+- Release SHA256SUMS and release-manifest.json were updated to include the standalone LICENSE asset
+
+The final public-download verification passed for the original wheel, original
+source archive and the standalone LICENSE asset.
