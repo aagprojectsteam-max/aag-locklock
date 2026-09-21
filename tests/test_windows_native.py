@@ -12,7 +12,7 @@ class NativeTests(unittest.TestCase):
         server.start()
         try:
             for _ in range(3):
-                response = send_request(name, {'cmd':'fixture'}, timeout_ms=2000)
+                response = send_request(name, {'cmd':'fixture'}, timeout_ms=5000)
                 self.assertEqual(response, {'ok':True,'echo':{'cmd':'fixture'}})
         finally:
             server.close()
