@@ -24,7 +24,7 @@ jobs:
       - name: Build checksums and manifest
         shell: bash
         run: |
-          sha256sum dist/*.whl dist/*.tar.gz > dist/SHA256SUMS
+          (cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS)
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
@@ -46,7 +46,7 @@ jobs:
               "assets": assets,
           }
           Path("dist/release-manifest.json").write_text(
-              json.dumps(manifest, indent=2, sort_keys=True) + "\\n"
+              json.dumps(manifest, indent=2, sort_keys=True) + "\n"
           )
           PY
       - name: Publish verified assets
