@@ -208,8 +208,11 @@ class NamedPipeServer:
                     self.phase = "awaiting-ack"
                     read_message(pipe, deadline, win32file)
                     self.phase = "ack-read"
-                except (TimeoutError, InterruptedError, EOFError):
-                    pass
+                except (TimeoutError, InterruptedError, EOFError) as exc:
+                    self.last_request_error = f"{type(exc).__name__}: {exc}"
+                    logging.getLogger(__name__).warning(
+                        "pipe request ended at phase %s: %s", self.phase, exc
+                    )
                 except Exception as exc:
                     self.last_request_error = f"{type(exc).__name__}: {exc}"
                     logging.getLogger(__name__).warning("pipe request rejected: %s", exc)
